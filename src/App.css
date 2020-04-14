@@ -43,3 +43,16 @@
   margin-right: 30px;
   width: 500px;
 }
+
+.task {
+  min-height: 80px;
+  background-color: white;
+  color: black;
+  overflow-wrap: break-word;
+  font-size: 20px;
+}
+
+.dueDate{
+  font-size: 14px;
+  color: green;
+}
