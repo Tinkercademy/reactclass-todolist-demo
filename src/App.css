@@ -1,5 +1,7 @@
 .App {
-  text-align: center;
+  background-color: #282c34;
+  min-height: 100vh;
+  color: white;
 }
 
 .App-logo {
@@ -35,4 +37,9 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.taskSetter{
+  margin-right: 30px;
+  width: 500px;
 }
