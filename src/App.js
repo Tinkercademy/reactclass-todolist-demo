@@ -25,6 +25,7 @@ class App extends Component{
     this.openEditor = this.openEditor.bind(this);
     this.closeEditor = this.closeEditor.bind(this);
     this.editTask = this.editTask.bind(this);
+    this.addSubTask = this.addSubTask.bind(this);
   }
 
   handleTask(e){
@@ -46,7 +47,7 @@ class App extends Component{
   addTask(){
     if(this.state.task !== "" && this.state.dueDate !== "")
     this.setState({
-      toDoList: [...this.state.toDoList, {ID: this.state.taskID, description: this.state.task, date: this.state.dueDate, pinned: false}]
+      toDoList: [...this.state.toDoList, {ID: this.state.taskID, description: this.state.task, date: this.state.dueDate, subTasks: [], pinned: false}]
     }, () => {
       console.log(this.state.toDoList)
       let newToDoList = this.state.toDoList
@@ -71,7 +72,7 @@ class App extends Component{
 
   pinTask(taskToPin){
     this.state.toDoList.forEach(task =>{
-      if(task.ID == taskToPin.ID){
+      if(task.ID === taskToPin.ID){
         task.pinned = true
         this.setState({
           toDoList: this.state.toDoList
@@ -84,7 +85,7 @@ class App extends Component{
 
   unpinTask(taskToUnpin){
     this.state.toDoList.forEach(task =>{
-      if(task.ID == taskToUnpin.ID){
+      if(task.ID === taskToUnpin.ID){
         task.pinned = false
         this.setState({
           toDoList: this.state.toDoList
@@ -108,12 +109,25 @@ class App extends Component{
 
   editTask(ID, description, dueDate){
     this.state.toDoList.forEach(task =>{
-      if(task.ID == ID){
+      if(task.ID === ID){
         task.description = description
         task.date = dueDate
         this.setState({
           toDoList: this.state.toDoList,
           editing: !this.state.editing
+        })
+      }
+    })
+  }
+
+  addSubTask(ID, subtask){
+    this.state.toDoList.forEach(task =>{
+      if(task.ID === ID){
+        task.subTasks = [...task.subTasks, subtask]
+        this.setState({
+          toDoList: this.state.toDoList,
+        }, () => {
+          console.log(this.state.toDoList)
         })
       }
     })
@@ -190,6 +204,7 @@ class App extends Component{
                 editTask = {this.editTask}
                 closePopup = {this.closeEditor}
                 taskToEdit = {this.state.taskToEdit}
+                addSubTask = {this.addSubTask}
             />  
             : null  
           }
