@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import Edit from './Edit';
 
 class App extends Component{
   constructor() {
@@ -7,15 +8,23 @@ class App extends Component{
 
 		this.state = {
       toDoList: [],
+      pinnedTasks: [],
       taskID: 0,
       task: "",
       dueDate: "",
+      editing: false,
+      taskToEdit: [],
     };
     
     this.handleTask = this.handleTask.bind(this);
     this.handleDueDate = this.handleDueDate.bind(this);
     this.addTask = this.addTask.bind(this);
     this.deleteTask = this.deleteTask.bind(this);
+    this.pinTask = this.pinTask.bind(this);
+    this.unpinTask = this.unpinTask.bind(this);
+    this.openEditor = this.openEditor.bind(this);
+    this.closeEditor = this.closeEditor.bind(this);
+    this.editTask = this.editTask.bind(this);
   }
 
   handleTask(e){
@@ -37,7 +46,7 @@ class App extends Component{
   addTask(){
     if(this.state.task !== "" && this.state.dueDate !== "")
     this.setState({
-      toDoList: [...this.state.toDoList, {ID: this.state.taskID, description: this.state.task, date: this.state.dueDate}]
+      toDoList: [...this.state.toDoList, {ID: this.state.taskID, description: this.state.task, date: this.state.dueDate, pinned: false}]
     }, () => {
       console.log(this.state.toDoList)
       let newToDoList = this.state.toDoList
@@ -60,21 +69,97 @@ class App extends Component{
     })
   }
 
+  pinTask(taskToPin){
+    this.state.toDoList.forEach(task =>{
+      if(task.ID == taskToPin.ID){
+        task.pinned = true
+        this.setState({
+          toDoList: this.state.toDoList
+        }, () => {
+          console.log(this.state.toDoList)
+        })
+      }
+    })
+  }
+
+  unpinTask(taskToUnpin){
+    this.state.toDoList.forEach(task =>{
+      if(task.ID == taskToUnpin.ID){
+        task.pinned = false
+        this.setState({
+          toDoList: this.state.toDoList
+        })
+      }
+    })
+  }
+
+  openEditor(task){
+    this.setState({
+      editing: !this.state.editing,
+      taskToEdit: task
+    })
+  }
+
+  closeEditor(){
+    this.setState({
+      editing: !this.state.editing
+    })
+  }
+
+  editTask(ID, description, dueDate){
+    this.state.toDoList.forEach(task =>{
+      if(task.ID == ID){
+        task.description = description
+        task.date = dueDate
+        this.setState({
+          toDoList: this.state.toDoList,
+          editing: !this.state.editing
+        })
+      }
+    })
+  }
+
   renderToDo(){
     return this.state.toDoList.map(task => {
-      return(
-        <div className="container task mb-2 p-2" key={task.ID}>
+      if(!task.pinned){
+        return(
+          <div className="container task mb-2 p-2" key={task.ID}>
+              <div className="row">
+                <div className="col-8">
+                    <div className="dueDate pb-1">Due: {task.date}</div>
+                    <span>{task.description}</span>
+                </div>
+                <div className="col-4 pt-2 pl-5">
+                  <button className="btn btn-success mx-2" onClick = {() => this.openEditor(task)}>Edit</button>
+                  <button className="btn btn-warning mr-2" onClick = {() => this.pinTask(task)}>Pin</button>
+                  <button className="btn btn-danger" onClick = {() => this.deleteTask(task)}>X</button>
+                </div>
+              </div>
+            </div>
+        );
+      }
+    })
+  }
+
+  renderPinnedTasks(){
+    return this.state.toDoList.map(task => {
+      if(task.pinned){
+        return(
+          <div className="container-fluid task mb-2 p-2" key={task.ID}>
             <div className="row">
-              <div className="col-9">
-                  <div className="dueDate pb-1">Due: {task.date}</div>
+              <div className="col-8">
+                  <div className="dueDate pb-1"><span>Due: {task.date}</span> <span>Pinned</span></div>
                   <span>{task.description}</span>
               </div>
-              <div className="col-3 pt-2">
+              <div className="col-4 pt-2 pl-5">
+                <button className="btn btn-success mx-2" onClick = {() => this.openEditor(task)}>Edit</button>
+                <button className="btn btn-warning mr-2" onClick = {() => this.unpinTask(task)}>Unpin</button>
                 <button className="btn btn-danger" onClick = {() => this.deleteTask(task)}>X</button>
               </div>
             </div>
           </div>
-      );
+        );
+      }
     })
   }
 
@@ -91,13 +176,23 @@ class App extends Component{
 
           <div className="container">
             <div className="row">
-              <div className="col-3"></div>
-              <div className="col-6">
-                {this.renderToDo() }
+              <div className="col-2"></div>
+              <div className="col-8">
+                {this.renderPinnedTasks() }                
+                {this.renderToDo() }              
               </div>
-              <div className="col-3"></div>
+              <div className="col-2"></div>
             </div>
           </div>
+
+          {this.state.editing ?  
+            <Edit
+                editTask = {this.editTask}
+                closePopup = {this.closeEditor}
+                taskToEdit = {this.state.taskToEdit}
+            />  
+            : null  
+          }
       </div>
     );
   }
